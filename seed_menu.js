@@ -28,6 +28,12 @@ const seedMenu = async () => {
                 order: 1
             },
             {
+                type: "text",
+                heading: "CULINARY EXCELLENCE",
+                content: "Indulge in a symphony of flavors inspired by the elegance of Paris and the vibrant spirit of the Mediterranean. At Verde NYC, every dish is a masterpiece, crafted with creativity and precision to ignite your senses and elevate your dining journey.",
+                order: 2
+            },
+            {
                 type: "menu-category",
                 heading: "FOOD MENU",
                 content: "Experience our curated Mediterranean and Asian fusion dishes",
@@ -36,7 +42,7 @@ const seedMenu = async () => {
                     "https://verde-nyc-s3.s3.eu-north-1.amazonaws.com/menu/2025 NV FORMAT VERDE NYC_Parades_DEC_page-0002.jpg",
                     "https://verde-nyc-s3.s3.eu-north-1.amazonaws.com/menu/2025_Verde NYC - FINAL_DEC_page-0002.jpg"
                 ],
-                order: 2
+                order: 3
             },
             {
                 type: "menu-category",
@@ -54,7 +60,7 @@ const seedMenu = async () => {
                     "https://verde-nyc-s3.s3.eu-north-1.amazonaws.com/menu/2025 NV FORMAT VERDE NYC_Vins_DEC_page-0009.jpg",
                     "https://verde-nyc-s3.s3.eu-north-1.amazonaws.com/menu/2025 NV FORMAT VERDE NYC_Vins_DEC_page-0010.jpg"
                 ],
-                order: 3
+                order: 4
             },
             {
                 type: "menu-category",
@@ -70,7 +76,15 @@ const seedMenu = async () => {
                     "https://verde-nyc-s3.s3.eu-north-1.amazonaws.com/menu/2025 NV FORMAT VERDE NYC - BAR livret A5_DEC_page-0007.jpg",
                     "https://verde-nyc-s3.s3.eu-north-1.amazonaws.com/menu/2025 NV FORMAT VERDE NYC - BAR livret A5_DEC_page-0008.jpg"
                 ],
-                order: 4
+                order: 5
+            },
+            {
+                type: "text",
+                heading: "RESERVE YOUR EXPERIENCE",
+                content: "Join us for an unforgettable dining journey at Verde NYC. Our team awaits to guide you through our exceptional menu, creating moments that linger long after the evening ends.",
+                ctaText: "MAKE A RESERVATION",
+                ctaLink: "https://www.sevenrooms.com/explore/verdenyc/reservations/create/search",
+                order: 6
             }
         ]
     };

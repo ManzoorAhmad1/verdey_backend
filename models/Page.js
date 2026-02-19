@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const sectionSchema = new mongoose.Schema({
   type: { 
     type: String, 
-    enum: ['hero', 'gallery', 'text', 'features', 'philosophy', 'menu', 'contact_info', 'parallax'], 
+    enum: ['hero', 'gallery', 'text', 'features', 'philosophy', 'menu', 'menu-category', 'contact_info', 'parallax'], 
     default: 'text' 
   },
   heading: String,
