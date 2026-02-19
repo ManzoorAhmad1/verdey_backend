@@ -17,7 +17,9 @@ const sectionSchema = new mongoose.Schema({
   items: [{
     name: String,
     description: String,
-    price: String
+    price: String,
+    image: String,
+    link: String
   }]
 });
 
