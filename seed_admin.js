@@ -11,7 +11,16 @@ const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI || 'mongodb:/
 
 const seed = async () => {
   try {
-    await mongoose.connect(MONGO_URI);
+    const opts = {
+      retryWrites: false,
+      authMechanism: 'SCRAM-SHA-1',
+      authSource: 'admin',
+      ...(process.env.DOCDB_TLS === 'true' && {
+        tls: true,
+        tlsCAFile: './global-bundle.pem',
+      }),
+    };
+    await mongoose.connect(MONGO_URI, opts);
     console.log('MongoDB connected');
 
     // Remove existing admins
