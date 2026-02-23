@@ -4,9 +4,12 @@ const connectDB = async () => {
     try {
         const opts = {
             retryWrites: false,          // Required for Amazon DocumentDB
-            serverSelectionTimeoutMS: 5000,
+            serverSelectionTimeoutMS: 10000,
+            authMechanism: 'SCRAM-SHA-1',
+            authSource: 'admin',
             ...(process.env.DOCDB_TLS === 'true' && {
                 tls: true,
+                tlsCAFile: './global-bundle.pem',
                 tlsAllowInvalidCertificates: false,
             }),
         };
