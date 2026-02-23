@@ -1,0 +1,39 @@
+/**
+ * Seed initial admin credentials into MongoDB.
+ * Run once: node seed_admin.js
+ * Default: admin@verdenyc.com / Verde@2024
+ */
+require('dotenv').config();
+const mongoose = require('mongoose');
+const Admin = require('./models/Admin');
+
+const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI || 'mongodb://localhost:27017/verde-nyc';
+
+const seed = async () => {
+  try {
+    await mongoose.connect(MONGO_URI);
+    console.log('MongoDB connected');
+
+    // Remove existing admins
+    await Admin.deleteMany({});
+
+    const admin = new Admin({
+      email: 'admin@verdenyc.com',
+      password: 'Verde@2024',
+    });
+
+    await admin.save();
+
+    console.log('✅ Admin seeded successfully!');
+    console.log('   Email   : admin@verdenyc.com');
+    console.log('   Password: Verde@2024');
+    console.log('\n⚠️  Settings page se password change kar lein!');
+  } catch (err) {
+    console.error('Seed error:', err.message);
+  } finally {
+    await mongoose.disconnect();
+    process.exit(0);
+  }
+};
+
+seed();
