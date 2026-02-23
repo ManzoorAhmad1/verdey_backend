@@ -2,7 +2,16 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
     try {
-        const conn = await mongoose.connect(process.env.MONGO_URI);
+        const opts = {
+            retryWrites: false,          // Required for Amazon DocumentDB
+            serverSelectionTimeoutMS: 5000,
+            ...(process.env.DOCDB_TLS === 'true' && {
+                tls: true,
+                tlsAllowInvalidCertificates: false,
+            }),
+        };
+
+        const conn = await mongoose.connect(process.env.MONGO_URI, opts);
         console.log(`MongoDB Connected: ${conn.connection.host}`);
     } catch (error) {
         console.error(`Error: ${error.message}`);
