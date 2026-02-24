@@ -6,7 +6,16 @@ dotenv.config();
 
 const connectDB = async () => {
     try {
-        const conn = await mongoose.connect(process.env.MONGO_URI);
+        const opts = {
+            retryWrites: false,
+            authMechanism: 'SCRAM-SHA-1',
+            authSource: 'admin',
+            ...(process.env.DOCDB_TLS === 'true' && {
+                tls: true,
+                tlsCAFile: './global-bundle.pem',
+            }),
+        };
+        const conn = await mongoose.connect(process.env.MONGO_URI, opts);
         console.log(`MongoDB Connected: ${conn.connection.host}`);
     } catch (error) {
         console.error(`Error: ${error.message}`);
