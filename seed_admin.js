@@ -36,7 +36,7 @@ const seed = async () => {
     console.log('✅ Admin seeded successfully!');
     console.log('   Email   : admin@verdenyc.com');
     console.log('   Password: Verde@2024');
-    console.log('\n⚠️  Settings page se password change kar lein!');
+    console.log('\n⚠️  Change password from Settings page!');
   } catch (err) {
     console.error('Seed error:', err.message);
   } finally {

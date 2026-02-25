@@ -9,8 +9,28 @@ const connectDB = require('./config/db');
 const pageRoutes = require('./routes/pageRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const authRoutes = require('./routes/authRoutes');
+const Admin = require('./models/Admin');
 
-connectDB();
+// Seed default admin if not exists
+const seedAdminIfNotExists = async () => {
+  try {
+    const existingAdmin = await Admin.findOne({ email: 'admin@verdenyc.com' });
+    if (!existingAdmin) {
+      const admin = new Admin({
+        email: 'admin@verdenyc.com',
+        password: 'Verde@2024',
+      });
+      await admin.save();
+      console.log('✅ Default admin seeded: admin@verdenyc.com / Verde@2024');
+    }
+  } catch (err) {
+    console.error('Admin seed check error:', err.message);
+  }
+};
+
+connectDB().then(() => {
+  seedAdminIfNotExists();
+});
 
 const app = express();
 

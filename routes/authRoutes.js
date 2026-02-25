@@ -10,14 +10,14 @@ const JWT_EXPIRES = '7d';
 const protect = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ success: false, message: 'Token nahi mili, unauthorized' });
+    return res.status(401).json({ success: false, message: 'No token provided, unauthorized' });
   }
   try {
     const token = authHeader.split(' ')[1];
     req.admin = jwt.verify(token, JWT_SECRET);
     next();
   } catch {
-    return res.status(401).json({ success: false, message: 'Token invalid ya expire ho gayi' });
+    return res.status(401).json({ success: false, message: 'Token invalid or expired' });
   }
 };
 
@@ -27,17 +27,17 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ success: false, message: 'Email aur password dono zaroori hain' });
+      return res.status(400).json({ success: false, message: 'Email and password are required' });
     }
 
     const admin = await Admin.findOne({ email: email.toLowerCase().trim() });
     if (!admin) {
-      return res.status(401).json({ success: false, message: 'Galat email ya password hai' });
+      return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
 
     const isMatch = await admin.matchPassword(password);
     if (!isMatch) {
-      return res.status(401).json({ success: false, message: 'Galat email ya password hai' });
+      return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
 
     const token = jwt.sign(
@@ -64,13 +64,13 @@ router.post('/change-password', protect, async (req, res) => {
 
     const admin = await Admin.findById(req.admin.id);
     if (!admin) {
-      return res.status(404).json({ success: false, message: 'Admin nahi mila' });
+      return res.status(404).json({ success: false, message: 'Admin not found' });
     }
 
     // Verify current password
     const isMatch = await admin.matchPassword(currentPassword);
     if (!isMatch) {
-      return res.status(400).json({ success: false, message: 'Purana password galat hai' });
+      return res.status(400).json({ success: false, message: 'Current password is incorrect' });
     }
 
     // Apply changes
@@ -81,7 +81,7 @@ router.post('/change-password', protect, async (req, res) => {
       if (newPassword.length < 6) {
         return res.status(400).json({
           success: false,
-          message: 'Naya password kam az kam 6 characters ka hona chahiye',
+          message: 'New password must be at least 6 characters',
         });
       }
       admin.password = newPassword; // pre-save hook will hash it
@@ -98,7 +98,7 @@ router.post('/change-password', protect, async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Credentials successfully update ho gaye!',
+      message: 'Credentials updated successfully!',
       token,
       admin: { email: admin.email },
     });
