@@ -4,9 +4,10 @@ const jwt = require('jsonwebtoken');
 const Admin = require('../models/Admin');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'verde-cms-super-secret-2024-change-this';
-const JWT_EXPIRES = '7d';
+const ACCESS_TOKEN_EXPIRES = '15m';   // Short-lived access token
+const REFRESH_TOKEN_EXPIRES = '7d';   // Long-lived refresh token
 
-// ─── Middleware: verify token ──────────────────────────────────────────────────
+// ─── Middleware: verify access token ───────────────────────────────────────────
 const protect = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -16,7 +17,10 @@ const protect = (req, res, next) => {
     const token = authHeader.split(' ')[1];
     req.admin = jwt.verify(token, JWT_SECRET);
     next();
-  } catch {
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ success: false, message: 'Access token expired', code: 'TOKEN_EXPIRED' });
+    }
     return res.status(401).json({ success: false, message: 'Token invalid or expired' });
   }
 };
@@ -40,19 +44,74 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
 
-    const token = jwt.sign(
-      { id: admin._id, email: admin.email },
+    // Generate access token (short-lived)
+    const accessToken = jwt.sign(
+      { id: admin._id, email: admin.email, type: 'access' },
       JWT_SECRET,
-      { expiresIn: JWT_EXPIRES }
+      { expiresIn: ACCESS_TOKEN_EXPIRES }
+    );
+
+    // Generate refresh token (long-lived)
+    const refreshToken = jwt.sign(
+      { id: admin._id, email: admin.email, type: 'refresh' },
+      JWT_SECRET,
+      { expiresIn: REFRESH_TOKEN_EXPIRES }
     );
 
     res.json({
       success: true,
-      token,
+      accessToken,
+      refreshToken,
       admin: { email: admin.email },
     });
   } catch (err) {
     console.error('Login error:', err.message);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// ─── POST /api/auth/refresh ────────────────────────────────────────────────────
+// Use refresh token to get new access token
+router.post('/refresh', async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(400).json({ success: false, message: 'Refresh token required' });
+    }
+
+    // Verify refresh token
+    let decoded;
+    try {
+      decoded = jwt.verify(refreshToken, JWT_SECRET);
+    } catch (err) {
+      return res.status(401).json({ success: false, message: 'Invalid or expired refresh token', code: 'REFRESH_EXPIRED' });
+    }
+
+    // Check if it's a refresh token type
+    if (decoded.type !== 'refresh') {
+      return res.status(401).json({ success: false, message: 'Invalid token type' });
+    }
+
+    // Check if admin still exists
+    const admin = await Admin.findById(decoded.id);
+    if (!admin) {
+      return res.status(401).json({ success: false, message: 'Admin not found' });
+    }
+
+    // Generate new access token
+    const accessToken = jwt.sign(
+      { id: admin._id, email: admin.email, type: 'access' },
+      JWT_SECRET,
+      { expiresIn: ACCESS_TOKEN_EXPIRES }
+    );
+
+    res.json({
+      success: true,
+      accessToken,
+    });
+  } catch (err) {
+    console.error('Refresh error:', err.message);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
@@ -89,17 +148,24 @@ router.post('/change-password', protect, async (req, res) => {
 
     await admin.save();
 
-    // Issue a fresh token (email may have changed)
-    const token = jwt.sign(
-      { id: admin._id, email: admin.email },
+    // Issue fresh tokens
+    const accessToken = jwt.sign(
+      { id: admin._id, email: admin.email, type: 'access' },
       JWT_SECRET,
-      { expiresIn: JWT_EXPIRES }
+      { expiresIn: ACCESS_TOKEN_EXPIRES }
+    );
+
+    const refreshToken = jwt.sign(
+      { id: admin._id, email: admin.email, type: 'refresh' },
+      JWT_SECRET,
+      { expiresIn: REFRESH_TOKEN_EXPIRES }
     );
 
     res.json({
       success: true,
       message: 'Credentials updated successfully!',
-      token,
+      accessToken,
+      refreshToken,
       admin: { email: admin.email },
     });
   } catch (err) {
@@ -109,7 +175,6 @@ router.post('/change-password', protect, async (req, res) => {
 });
 
 // ─── GET /api/auth/verify [protected] ─────────────────────────────────────────
-// Used by CMS middleware to verify a JWT without the edge-runtime jose library
 router.get('/verify', protect, (req, res) => {
   res.json({ success: true, admin: req.admin });
 });
