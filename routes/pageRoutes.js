@@ -65,8 +65,8 @@ router.get('/:slug', async (req, res) => {
 // @route   POST /api/pages
 router.post('/', async (req, res) => {
     try {
-        const { title, slug, sections } = req.body;
-        const page = new Page({ title, slug, sections });
+        const { title, slug, seoTitle, seoDescription, sections } = req.body;
+        const page = new Page({ title, slug, seoTitle, seoDescription, sections });
         const createdPage = await page.save();
         res.status(201).json({ message: "Page created", page: createdPage });
     } catch (error) {
@@ -89,6 +89,8 @@ router.put('/:id', async (req, res) => {
 
             page.title = req.body.title || page.title;
             page.slug = req.body.slug || page.slug;
+            page.seoTitle = req.body.seoTitle !== undefined ? req.body.seoTitle : page.seoTitle;
+            page.seoDescription = req.body.seoDescription !== undefined ? req.body.seoDescription : page.seoDescription;
             page.sections = req.body.sections || page.sections;
             
             // Find new image URLs

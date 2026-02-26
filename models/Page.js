@@ -26,6 +26,8 @@ const sectionSchema = new mongoose.Schema({
 const pageSchema = new mongoose.Schema({
   slug: { type: String, required: true, unique: true },
   title: { type: String, required: true },
+  seoTitle: { type: String, default: '' },
+  seoDescription: { type: String, default: '' },
   sections: [sectionSchema]
 }, { timestamps: true });
 

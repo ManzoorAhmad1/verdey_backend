@@ -9,6 +9,7 @@ const connectDB = require('./config/db');
 const pageRoutes = require('./routes/pageRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const authRoutes = require('./routes/authRoutes');
+const settingsRoutes = require('./routes/settingsRoutes');
 const Admin = require('./models/Admin');
 
 // Seed default admin if not exists
@@ -50,6 +51,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/pages', pageRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // Base route
 app.get('/', (req, res) => {
