@@ -60,6 +60,12 @@ const seedContact = async () => {
                 order: 2
             },
             {
+                type: "contact_image",
+                heading: "Contact Side Image",
+                images: ["https://verde-nyc-s3.s3.eu-north-1.amazonaws.com/images/_40A8472.jpg"],
+                order: 3
+            },
+            {
                 type: "text",
                 heading: "Find Us In The Heart Of Manhattan",
                 content: "Part of the Yeeels Group family — with venues in Paris, Saint-Tropez, Dubai, Italy, and New York",
