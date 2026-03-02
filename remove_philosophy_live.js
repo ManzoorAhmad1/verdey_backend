@@ -18,6 +18,7 @@ async function removePhilosophySections() {
       tls: true,
       tlsCAFile: './global-bundle.pem',
       retryWrites: false,
+      authMechanism: 'SCRAM-SHA-1',
       serverSelectionTimeoutMS: 10000, // 10 second timeout
       socketTimeoutMS: 45000,
     };
