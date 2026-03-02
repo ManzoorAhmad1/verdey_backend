@@ -12,6 +12,8 @@ const sectionSchema = new mongoose.Schema({
   images: [String],
   ctaLink: String,
   ctaText: String,
+  ctaLink2: String,
+  ctaText2: String,
   order: { type: Number, default: 0 },
   styles: mongoose.Schema.Types.Mixed,
   items: [{
