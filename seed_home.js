@@ -31,7 +31,7 @@ const homePageData = {
     // 
     // CMS FORMATTING INSTRUCTIONS:
     // In Content field, enter each paragraph on a NEW LINE (press Enter after each)
-    // Last line will automatically be italic
+    // Last line will automatically be  
     {
       type: 'features',
       heading: 'WHERE PARISIAN CRAFT MEETS NEW YORK SOUL',
