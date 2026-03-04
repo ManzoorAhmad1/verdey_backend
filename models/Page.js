@@ -10,6 +10,7 @@ const sectionSchema = new mongoose.Schema({
   subheading: String,
   content: String,
   images: [String],
+  mobileImages: [String],
   ctaLink: String,
   ctaText: String,
   ctaLink2: String,
