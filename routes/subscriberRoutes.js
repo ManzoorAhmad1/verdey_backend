@@ -89,8 +89,13 @@ router.post('/', async (req, res) => {
 
     const settings = await SiteSettings.findById('global');
     const notifyEmail = settings?.newsletterNotifyEmail?.trim();
+    console.log('Newsletter notify email:', notifyEmail || 'not set');
+    console.log('SMTP user present:', Boolean(smtpUser));
+    console.log('SMTP pass present:', Boolean(smtpPass));
     if (mailTransport && smtpUser && notifyEmail) {
       try {
+        await mailTransport.verify();
+        console.log('SMTP transport verified');
         await mailTransport.sendMail({
           from: smtpUser,
           to: notifyEmail,
