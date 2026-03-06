@@ -106,9 +106,8 @@ router.post('/', async (req, res) => {
     }
 
     const existing = await Subscriber.findOne({ email: email.toLowerCase() });
-    console.log(existing, 'existing')
     if (existing) {
-      return res.status(200).json({ message: 'You are already subscribed.' });
+      return res.status(409).json({ message: 'You are already subscribed.' });
     }
     let subscriber;
     if (!existing) {
@@ -145,7 +144,7 @@ router.post('/', async (req, res) => {
     return res.status(201).json({ message: 'Subscribed successfully.' });
   } catch (error) {
     if (error?.code === 11000) {
-      return res.status(200).json({ message: 'You are already subscribed.' });
+      return res.status(409).json({ message: 'You are already subscribed.' });
     }
     console.error('Subscriber error:', error);
     return res.status(500).json({ message: 'Unable to subscribe right now.' });
