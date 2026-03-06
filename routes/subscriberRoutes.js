@@ -1,17 +1,17 @@
 const express = require('express');
-const { SESClient, SendEmailCommand } = require('@aws-sdk/client-ses');
+const nodemailer = require('nodemailer');
 const Subscriber = require('../models/Subscriber');
 const SiteSettings = require('../models/SiteSettings');
 
 const router = express.Router();
-
-const sesClient = new SESClient({
-  region: process.env.AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  },
-});
+const smtpUser = process.env.SMTP_USER;
+const smtpPass = process.env.SMTP_PASS;
+const mailTransport = smtpUser && smtpPass
+  ? nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user: smtpUser, pass: smtpPass },
+    })
+  : null;
 
 const isValidEmail = (email) => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -87,31 +87,23 @@ router.post('/', async (req, res) => {
       source: 'footer',
     });
 
-    const fromEmail = process.env.SES_FROM_EMAIL || process.env.AWS_SES_FROM_EMAIL;
     const settings = await SiteSettings.findById('global');
-    const notifyEmail = settings?.newsletterNotifyEmail?.trim() || process.env.SES_NOTIFY_EMAIL || fromEmail;
-    if (fromEmail && notifyEmail) {
-      const command = new SendEmailCommand({
-        Source: fromEmail,
-        Destination: {
-          ToAddresses: [notifyEmail],
-        },
-        Message: {
-          Subject: { Data: 'New Newsletter Signup - Verde NYC', Charset: 'UTF-8' },
-          Body: {
-            Html: { Data: buildNotificationHtml(subscriber.email), Charset: 'UTF-8' },
-            Text: { Data: `New signup: ${subscriber.email}`, Charset: 'UTF-8' },
-          },
-        },
-      });
+    const notifyEmail = settings?.newsletterNotifyEmail?.trim();
+    if (mailTransport && smtpUser && notifyEmail) {
       try {
-        await sesClient.send(command);
+        await mailTransport.sendMail({
+          from: smtpUser,
+          to: notifyEmail,
+          subject: 'New Newsletter Signup - Verde NYC',
+          text: `New signup: ${subscriber.email}`,
+          html: buildNotificationHtml(subscriber.email),
+        });
         console.log(`Email sent successfully to ${notifyEmail}`);
       } catch (sendError) {
         console.error('Email send failed:', sendError?.message || sendError);
       }
     } else {
-      console.warn('Email not sent: SES_FROM_EMAIL or SES_NOTIFY_EMAIL missing');
+      console.warn('Email not sent: SMTP_USER/SMTP_PASS or NOTIFY_EMAIL missing');
     }
 
     return res.status(201).json({ message: 'Subscribed successfully.' });

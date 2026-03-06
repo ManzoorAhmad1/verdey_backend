@@ -27,6 +27,7 @@ const siteSettingsSchema = new mongoose.Schema({
 
   // Newsletter notifications
   newsletterNotifyEmail: { type: String, default: 'event@yeeels.com' },
+
   
 }, { timestamps: true });
 
