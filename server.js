@@ -10,6 +10,7 @@ const pageRoutes = require('./routes/pageRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const authRoutes = require('./routes/authRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
+const subscriberRoutes = require('./routes/subscriberRoutes');
 const Admin = require('./models/Admin');
 
 // Seed default admin if not exists
@@ -52,6 +53,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/pages', pageRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/subscribers', subscriberRoutes);
 
 // Base route
 app.get('/', (req, res) => {
