@@ -10,6 +10,7 @@ const DEFAULTS = {
     phone: '+16467763660',
     email: 'contact@verde-nyc.com',
     instagramUrl: '',
+    newsletterNotifyEmail: 'event@yeeels.com',
 };
 
 // @desc    Get site settings
@@ -31,6 +32,7 @@ router.get('/', async (req, res) => {
             phone: settings.phone || DEFAULTS.phone,
             email: settings.email || DEFAULTS.email,
             instagramUrl: settings.instagramUrl || DEFAULTS.instagramUrl,
+            newsletterNotifyEmail: settings.newsletterNotifyEmail || DEFAULTS.newsletterNotifyEmail,
         };
         
         res.json({ settings: response });
@@ -53,7 +55,8 @@ router.put('/', async (req, res) => {
             facebookUrl,
             phone,
             email,
-            address
+            address,
+            newsletterNotifyEmail
         } = req.body;
 
         let settings = await SiteSettings.findById('global');
@@ -72,6 +75,7 @@ router.put('/', async (req, res) => {
         if (phone !== undefined) settings.phone = phone;
         if (email !== undefined) settings.email = email;
         if (address !== undefined) settings.address = address;
+        if (newsletterNotifyEmail !== undefined) settings.newsletterNotifyEmail = newsletterNotifyEmail;
 
         await settings.save();
         

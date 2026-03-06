@@ -1,6 +1,7 @@
 const express = require('express');
 const { SESClient, SendEmailCommand } = require('@aws-sdk/client-ses');
 const Subscriber = require('../models/Subscriber');
+const SiteSettings = require('../models/SiteSettings');
 
 const router = express.Router();
 
@@ -87,7 +88,8 @@ router.post('/', async (req, res) => {
     });
 
     const fromEmail = process.env.SES_FROM_EMAIL || process.env.AWS_SES_FROM_EMAIL;
-    const notifyEmail = process.env.SES_NOTIFY_EMAIL || fromEmail;
+    const settings = await SiteSettings.findById('global');
+    const notifyEmail = settings?.newsletterNotifyEmail?.trim() || process.env.SES_NOTIFY_EMAIL || fromEmail;
     if (fromEmail && notifyEmail) {
       const command = new SendEmailCommand({
         Source: fromEmail,

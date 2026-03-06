@@ -24,6 +24,9 @@ const siteSettingsSchema = new mongoose.Schema({
   phone: { type: String, default: '+16467763660' },
   email: { type: String, default: 'contact@verde-nyc.com' },
   address: { type: String, default: '' },
+
+  // Newsletter notifications
+  newsletterNotifyEmail: { type: String, default: 'event@yeeels.com' },
   
 }, { timestamps: true });
 
